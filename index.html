@@ -3,10 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Proxy</title>
+    <title>Netlify Proxy</title>
 </head>
 <body>
-    <h1>Welcome to Mr.Patel's Netlify Proxy</h1>
-    <p>Benito Made me make this.</p>
+    <h1>Welcome to My Netlify Proxy</h1>
+    <p>This site uses a serverless function to proxy requests.</p>
+
+    <!-- Place the script just before the closing body tag -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const targetUrl = this.href;
+                    const proxyUrl = `${window.location.origin}/.netlify/functions/proxy?url=${encodeURIComponent(targetUrl)}`;
+                    window.location.href = proxyUrl;
+                });
+            });
+        });
+    </script>
 </body>
 </html>
