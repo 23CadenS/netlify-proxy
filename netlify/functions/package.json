@@ -1,0 +1,9 @@
+{
+  "name": "netlify-proxy",
+  "version": "1.0.0",
+  "description": "A basic proxy using Netlify Functions",
+  "main": "index.html",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
