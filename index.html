@@ -22,5 +22,18 @@
             });
         });
     </script>
+    <script>
+        function loadYouTubeVideo() {
+            const url = document.getElementById("youtube-url").value;
+            const videoId = new URL(url).searchParams.get("v");
+            if (videoId) {
+                const iframe = document.getElementById("youtube-frame");
+                iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                iframe.style.display = "block";
+            } else {
+                alert("Please enter a valid YouTube video URL.");
+            }
+        }
+    </script>
 </body>
 </html>
