@@ -10,6 +10,16 @@ exports.handler = async function(event, context) {
         };
     }
 
+    // Check if the URL is a YouTube video link
+    if (targetUrl.includes("youtube.com/watch")) {
+        return {
+            statusCode: 302,
+            headers: {
+                Location: targetUrl
+            }
+        };
+    }
+
     try {
         const response = await fetch(targetUrl);
         let data = await response.text();
