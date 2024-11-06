@@ -1,4 +1,6 @@
+
 const fetch = require('node-fetch');
+const cache = new Map(); // Simple in-memory cache
 
 exports.handler = async function(event, context) {
     const targetUrl = event.queryStringParameters.url;
@@ -10,8 +12,28 @@ exports.handler = async function(event, context) {
         };
     }
 
+    // Use cache for faster repeated requests
+    if (cache.has(targetUrl)) {
+        return {
+            statusCode: 200,
+            body: cache.get(targetUrl).data,
+            headers: cache.get(targetUrl).headers
+        };
+    }
+
     try {
-        const response = await fetch(targetUrl);
+        const response = await fetch(targetUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; Netlify-Proxy/1.0)',
+                'Accept': '*/*',
+            }
+        });
+
+        // Check if the response is OK
+        if (!response.ok) {
+            throw new Error(`Error fetching the URL: ${response.statusText}`);
+        }
+
         let data = await response.text();
 
         // Rewrite all URLs to go through the proxy
@@ -20,12 +42,19 @@ exports.handler = async function(event, context) {
             return `${attr}="${baseProxyUrl}${encodeURIComponent(new URL(path, targetUrl).href)}"`;
         });
 
+        // Set response headers
+        const headers = {
+            "Content-Type": response.headers.get("content-type") || "text/html",
+            "Cache-Control": "max-age=300"  // Cache control for client-side caching
+        };
+
+        // Cache the response
+        cache.set(targetUrl, { data, headers });
+
         return {
             statusCode: 200,
             body: data,
-            headers: {
-                "Content-Type": response.headers.get("content-type")
-            }
+            headers: headers
         };
     } catch (error) {
         return {
